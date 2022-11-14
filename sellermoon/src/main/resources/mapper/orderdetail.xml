@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.orderdetailMapper">
+	<resultMap type="kh.sellermoon.member.vo.OrderDetailVO"
+		id="paymentMap"></resultMap>
+	<select id="orderdetail" parameterType="map"
+		resultType="java.util.Map">
+		select TB_ORDER.ORDER_NO, TB_ORDER.ORDER_PAYMENT, TB_ORDER.ORDER_DATE
+		, TB_ORDER.ORDER_USED_POINT, TB_ORDER_DE.ORDER_DE_CANCEL
+		,
+		TB_DELIVERY.DELIVERY_STATUS, TB_DELIVERY.DELIVERY_DATE,
+		TB_DELIVERY.DELIVERY_COMPANY
+		, TB_DELIVERY.DELIVERY_NO,
+		TB_DELIVERY.DELIVERY_FEE,
+		TB_DELIVERY.DELIVERY_ADDRESS
+		,
+		TB_DELIVERY.DELIVERY_PHONE
+		, TB_PURCHASE.PURCHASE_METHOD
+		from TB_ORDER
+		inner join TB_ORDER_DE
+		on TB_ORDER.ORDER_NO = TB_ORDER_DE.ORDER_NO
+		inner join TB_DELIVERY
+		on TB_ORDER_DE.ORDER_NO = TB_DELIVERY.ORDER_NO
+		inner join TB_PURCHASE
+		on TB_ORDER.ORDER_NO = TB_PURCHASE.ORDER_NO
+		<where>
+			<if test="ORDER_NO!=null">
+				AND TB_ORDER.ORDER_NO = #{ORDER_NO}
+			</if>
+		</where>
+	</select>
+	<select id="orderdetail2" parameterType="map"
+		resultType="java.util.Map">
+		select TB_ORDER.ORDER_NO,TB_ORDER.ORDER_PAYMENT, TB_ORDER.ORDER_DATE
+		,
+		TB_ORDER.ORDER_USED_POINT,TB_ORDER.CART_NO
+		, TB_MEMBER.MEMBER_NAME, TB_MEMBER.MEMBER_EMAIL
+		,
+		TB_CART.MD_NO, TB_CART.CART_QUANTITY, TB_CART.ORDER_TYPE
+		,
+		TB_MD.MD_PRICE, TB_MD.MD_IMAGE, TB_MD.MD_NAME, TB_MD.MD_BRAND,
+		TB_MD.MD_IMAGE_URL
+		from TB_ORDER
+		inner join TB_MEMBER
+		on
+		TB_ORDER.MEMBER_NO = TB_MEMBER.MEMBER_NO
+		inner join TB_CART
+		on
+		TB_ORDER.CART_NO = TB_CART.CART_NO
+		inner join TB_MD
+		on TB_MD.MD_NO =
+		TB_CART.MD_NO
+		<if test="ORDER_NO!=null">
+			AND TB_ORDER.ORDER_NO = #{ORDER_NO}
+		</if>
+	</select>
+
+	<!-- 현황 취소로 배송정보 업데이트 -->
+	<update id="deliUpdate" parameterType="map">
+		update TB_DELIVERY
+		set
+		DELIVERY_STATUS= '주문취소'
+		WHERE ORDER_NO =#{ORDER_NO}
+	</update>
+
+	<!-- 현황 취소로 오더정보 업데이트 -->
+	<update id="cancelUpdate" parameterType="map">
+		update TB_ORDER_DE
+		set
+		ORDER_DE_CANCEL= 'Y'
+		WHERE ORDER_NO =#{ORDER_NO}
+	</update>
+
+
+</mapper>

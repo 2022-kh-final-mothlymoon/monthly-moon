@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.storeMapper">
+   <resultMap type="kh.sellermoon.admin.vo.StoreVO" id="storeMap"></resultMap>
+    <select id="storeList" parameterType="map" resultType="java.util.Map">
+  SELECT TB_STORE.STORE_NO,STORE_CONTACT,STORE_MANAGER
+  ,STORE_MEMO,STORE_YN,STORE_START_DATE,FIELD
+FROM TB_STORE <!-- LEFT JOIN TB_AMD
+ON TB_STORE.STORE_NO = TB_AMD.STORE_NO -->
+<where>
+         <if test="STORE_NO>0">
+           AND tb_store.STORE_NO = #{STORE_NO}
+        </if>
+         <if test='gubun!=null and gubun.equals("STORE_YN")'>
+           AND STORE_YN LIKE '%'||#{word}||'%'
+        </if>
+         <if test='gubun!=null and gubun.equals("FIELD")'>
+           AND FIELD LIKE '%'||#{word}||'%'
+        </if>
+         <if test='gubun!=null and gubun.equals("STORE_MANAGER")'>
+           AND STORE_MANAGER LIKE '%'||#{word}||'%'
+        </if>
+        </where> 
+        ORDER BY STORE_NO asc        
+   </select>
+    <select id="storeDetail" parameterType="map"  resultType="java.util.Map">
+    SELECT TB_STORE.STORE_NO,MD_NO,MD_NAME,STORE_CONTACT,STORE_MANAGER,STORE_MEMO,STORE_YN,STORE_START_DATE,FIELD
+FROM TB_STORE LEFT JOIN TB_AMD
+ON TB_STORE.STORE_NO = TB_AMD.STORE_NO
+<where>
+         <if test="STORE_NO>0">
+           AND tb_store.STORE_NO = #{STORE_NO}
+        </if>
+        </where>
+   </select>
+
+    <insert id="storeInsert" parameterType="map">
+       INSERT INTO tb_store(STORE_NO,  STORE_CONTACT, STORE_MANAGER, STORE_MEMO,STORE_YN,FIELD,STORE_START_DATE) 
+       VALUES(STORE_NO_SEQ.nextval,#{STORE_CONTACT},#{STORE_MANAGER},#{STORE_MEMO},'Y',#{FIELD},to_char(sysdate, 'YYYY-MM-DD'))
+    </insert>
+    
+     <update id="storeUpdate" parameterType="map">
+      UPDATE tb_store
+         SET FIELD = #{FIELD}
+            ,STORE_MANAGER = #{STORE_MANAGER}
+            ,STORE_MEMO = #{STORE_MEMO}
+            ,STORE_YN = #{STORE_YN}
+            ,STORE_CONTACT = #{STORE_CONTACT}
+       WHERE STORE_NO = #{STORE_NO}
+   </update>
+    
+<!--     <delete id="storeDelete" parameterType="map">
+      delete from tb_store
+      where STORE_NO = #{STORE_NO}
+   </delete> -->
+</mapper>  

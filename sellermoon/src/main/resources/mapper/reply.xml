@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.mybatis.mapper.replyMapper">
+	<resultMap type="java.util.Map" id="replyMap"></resultMap>
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 공통 쿼리 시작 ]]]]]]]]]]]]]]]]]]]] -->
+	
+	<!-- 댓글 조회 (해당하는 게시글의 댓글 조회) : jsonReplyList 호출 -->
+	<select id="replyList" parameterType="java.util.Map" resultType="map">
+		SELECT member_name, reply_date
+			  ,DECODE(reply_blind, 'Y', '블라인드 처리된 댓글입니다.', reply_content) AS reply_content
+			  ,reply_like, reply_dislike, board_no, member_no, reply_no, reply_blind
+	  	  FROM tb_reply NATURAL JOIN tb_member
+		<where>
+			<if test='board_no !=null'>
+				AND board_no = #{board_no}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="replyDelete" parameterType="map">
+		DELETE FROM tb_reply
+		 WHERE reply_no = #{reply_no}
+	</delete>
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 공통 쿼리 종료 ]]]]]]]]]]]]]]]]]]]] -->
+	
+	
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 관리자 쿼리 시작 ]]]]]]]]]]]]]]]]]]]] -->
+	<!-- 댓글 블라인드 -->
+	<update id="replyAUpdate" parameterType="map">
+		UPDATE tb_reply
+		   SET reply_blind = #{reply_blind}
+		 WHERE reply_no = #{reply_no}
+	</update>
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 관리자 쿼리 종료 ]]]]]]]]]]]]]]]]]]]] -->
+	
+	
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 회원 쿼리 시작 ]]]]]]]]]]]]]]]]]]]] -->
+	
+	<!-- 댓글 작성 -->
+	<insert id='replyMInsert' parameterType="map">
+		INSERT INTO tb_reply 
+    				(reply_no, board_no, member_no, reply_content, reply_date)
+			 VALUES (reply_no_seq.NEXTVAL, #{board_no}, #{member_no}, #{reply_content}, sysdate)
+	</insert>
+	
+	<!-- 댓글 수정 -->
+	<update id="replyMUpdate" parameterType="map">
+		UPDATE tb_reply
+		   SET reply_content = #{reply_content}
+		 WHERE reply_no = #{reply_no}
+	</update>
+
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mybatis.mapper.subsMapper">
+	<resultMap type="kh.sellermoon.member.vo.SubsVO" id="subsMap"></resultMap>
+	
+	<select id="subsList" parameterType="map" resultType="java.util.Map">
+		SELECT mem.member_name, mem.member_address_detail
+			   , sub.sub_end, sub.sub_start
+			   , mem.member_address, md.md_name
+			   , md.md_price, md.st_amount, md.md_content
+		       , sub.sub_period, sub.sub_no
+		  FROM tb_member mem, tb_subs sub, tb_md md
+		  WHERE mem.member_no = sub.member_no
+			AND sub.md_no = md.md_no
+			AND mem.member_no = #{member_no}   	
+	</select> 
+	
+	<select id="subsDeliver" parameterType="map" resultType="java.util.Map">
+		SELECT ord.order_date, del.delivery_status, del.delivery_date
+		  FROM tb_subs sub, tb_order ord, tb_delivery del
+		 WHERE sub.member_no = ord.member_no
+		   AND ord.order_no = del.order_no
+		   AND ord.order_no LIKE 'T%'
+		   AND sub.member_no = #{member_no}  
+	</select> 
+	
+	<select id="subsPurchase" parameterType="map" resultType="java.util.Map">
+		SELECT purchase_method
+		  FROM tb_subs sub, tb_order ord, tb_purchase pur
+		 WHERE sub.member_no = ord.member_no
+		   AND ord.order_no = pur.order_no
+		   AND ord.order_no LIKE 'T%'
+		   AND sub.member_no = #{member_no} 
+	</select> 
+	
+	<update id="periodUpdate" parameterType="map">
+		UPDATE tb_subs
+		   SET sub_period = #{sub_period}
+	</update>
+	
+	<update id="pauseUpdate" parameterType="map">
+		UPDATE tb_subs
+		   SET sub_end = #{sub_end}
+	</update>
+	
+	<select id="mySubs" parameterType="map" resultType="java.util.Map">
+		SELECT md.md_name
+		  FROM tb_subs sub, tb_md md
+		 WHERE sub.md_no = md.md_no
+		   AND sub.member_no = #{member_no}
+	</select> 
+	
+
+</mapper>	

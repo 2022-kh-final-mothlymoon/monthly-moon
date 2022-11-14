@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.amdMapper">
+	<resultMap type="kh.sellermoon.admin.vo.AmdVO" id="amdMap"></resultMap>
+	<select id="amdList" parameterType="map"
+		resultType="java.util.Map">
+		SELECT TB_MD.MD_NO,MD_CONTENT,MD_PRICE,MD_IMAGE,MD_DETAIL_IMAGE
+        ,MD_COST,MD_CATEGORY,MD_DISCOUNT,MD_NAME,MD_BRAND,STORE_NO
+        ,MD_IMAGE_URL,MD_DETAIL_IMAGE_URL,ST_AMOUNT
+        FROM TB_MD 
+		<where>
+			<if test="MD_NO>0">
+				AND MD_NO = #{MD_NO}
+			</if>
+			<if test='gubun!=null and gubun.equals("MD_NAME")'>
+           AND MD_NAME LIKE '%'||#{word}||'%'
+        </if>
+         <if test='gubun!=null and gubun.equals("MD_BRAND")'>
+           AND MD_BRAND LIKE '%'||#{word}||'%'
+        </if>
+         
+		</where>
+		ORDER BY MD_NO asc
+	</select>
+<!-- 	<select id="amdList" parameterType="map"
+		resultType="java.util.Map">
+		SELECT TB_AMD.MD_NO,MD_CONTENT,MD_PRICE,MD_IMAGE,MD_DETAIL_IMAGE
+        ,MD_COST,MD_CATEGORY,MD_DISCOUNT,MD_NAME,MD_BRAND,STORE_NO,MD_IMAGE_URL,MD_DETAIL_IMAGE_URL,TB_ASTOCK.ST_AMOUNT
+        FROM TB_AMD LEFT JOIN TB_ASTOCK
+        ON TB_AMD.MD_NO = TB_ASTOCK.MD_NO
+		<where>
+			<if test="MD_NO>0">
+				AND TB_AMD.MD_NO = #{MD_NO}
+			</if>
+		</where>
+		ORDER BY MD_NO asc
+	</select> -->
+	<select id="amdDetail" parameterType="map"
+		resultType="java.util.Map">
+		SELECT TB_MD.MD_NO,MD_CONTENT,MD_PRICE,MD_IMAGE,MD_DETAIL_IMAGE
+        ,MD_COST,MD_CATEGORY,MD_DISCOUNT,MD_NAME,MD_BRAND,STORE_NO
+        ,MD_IMAGE_URL,MD_DETAIL_IMAGE_URL,ST_AMOUNT
+        FROM TB_MD 
+		<where>
+			<if test="MD_NO>0">
+				AND TB_MD.MD_NO = #{MD_NO}
+			</if>
+		</where>
+	</select>
+
+	<insert id="amdInsert" parameterType="map">
+		 INSERT
+        INTO TB_MD(MD_NO,MD_CONTENT,MD_PRICE,MD_IMAGE,MD_DETAIL_IMAGE
+        ,MD_COST,MD_CATEGORY,MD_DISCOUNT,MD_NAME,MD_BRAND
+        ,STORE_NO,MD_IMAGE_URL,MD_DETAIL_IMAGE_URL,ST_AMOUNT)
+        VALUES(MD_NO_SEQ.nextval,#{MD_CONTENT},#{MD_PRICE},#{MD_IMAGE}
+        ,#{MD_DETAIL_IMAGE},#{MD_COST},#{MD_CATEGORY},#{MD_DISCOUNT}
+        ,#{MD_NAME},#{MD_BRAND},#{STORE_NO},#{MD_IMAGE_URL},#{MD_DETAIL_IMAGE_URL},#{ST_AMOUNT})
+        
+	</insert>
+<!-- 	<insert id="amdInsert" parameterType="map">
+		 INSERT ALL
+        INTO TB_AMD(MD_NO,MD_CONTENT,MD_PRICE,MD_IMAGE,MD_DETAIL_IMAGE
+        ,MD_COST,MD_CATEGORY,MD_DISCOUNT,MD_NAME,MD_BRAND
+        ,STORE_NO,MD_IMAGE_URL,MD_DETAIL_IMAGE_URL)
+        VALUES(MD_NO_SEQ.nextval,#{MD_CONTENT},#{MD_PRICE},#{MD_IMAGE},#{MD_DETAIL_IMAGE}
+        ,#{MD_COST},#{MD_CATEGORY},#{MD_DISCOUNT},#{MD_NAME},#{MD_BRAND}
+        ,#{STORE_NO},#{MD_IMAGE_URL},#{MD_DETAIL_IMAGE_URL})
+        INTO TB_ASTOCK(MD_NO,ST_AMOUNT)
+        VALUES(MD_NO_SEQ.nextval,#{ST_AMOUNT})
+        SELECT * FROM DUAL
+	</insert> -->
+
+	<update id="amdUpdate" parameterType="map">
+		UPDATE TB_MD
+        SET MD_CONTENT = #{MD_CONTENT}
+        ,MD_PRICE = #{MD_PRICE}
+        ,MD_NAME = #{MD_NAME}
+        ,MD_IMAGE = #{MD_IMAGE}
+        ,MD_IMAGE_URL = #{MD_IMAGE_URL}
+        ,MD_COST = #{MD_COST}
+        ,MD_CATEGORY = #{MD_CATEGORY}
+        ,MD_DISCOUNT = #{MD_DISCOUNT}
+        ,MD_BRAND = #{MD_BRAND}
+        ,STORE_NO = #{STORE_NO}
+        ,MD_DETAIL_IMAGE=#{MD_DETAIL_IMAGE}
+        ,MD_DETAIL_IMAGE_URL=#{MD_DETAIL_IMAGE_URL}
+        ,ST_AMOUNT=#{ST_AMOUNT}
+        WHERE MD_NO = #{MD_NO}
+        
+        
+	</update>
+	<!-- <update id="amdUpdate" parameterType="map">
+		UPDATE TB_AMD, TB_ASTOCK
+        SET TB_AMD.MD_CONTENT = #{MD_CONTENT}
+        ,TB_AMD.MD_PRICE = #{MD_PRICE}
+        ,TB_AMD.MD_NAME = #{MD_NAME}
+        ,TB_AMD.MD_IMAGE = #{MD_IMAGE}
+        ,TB_AMD.MD_IMAGE_URL = #{MD_IMAGE_URL}
+        ,TB_AMD.MD_COST = #{MD_COST}
+        ,TB_AMD.MD_CATEGORY = #{MD_CATEGORY}
+        ,TB_AMD.MD_DISCOUNT = #{MD_DISCOUNT}
+        ,TB_AMD.MD_BRAND = #{MD_BRAND}
+        ,TB_AMD.STORE_NO = #{STORE_NO}
+        ,TB_AMD.MD_DETAIL_IMAGE=#{MD_DETAIL_IMAGE}
+        ,TB_AMD.MD_DETAIL_IMAGE_URL=#{MD_DETAIL_IMAGE_URL}
+        ,TB_ASTOCK.ST_AMOUNT=#{ST_AMOUNT}
+        WHERE TB_AMD.MD_NO = #{MD_NO}
+        AND TB_ASTOCK.MD_NO = #{MD_NO}
+	</update> -->
+
+	<delete id="amdDelete" parameterType="map">
+		delete from TB_MD
+		<where>
+			<if test="MD_NO>0">
+				AND MD_NO = #{MD_NO}
+			</if>
+		</where>
+	</delete>
+</mapper>  

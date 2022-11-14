@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.mybatis.mapper.reportMapper">
+	<resultMap type="java.util.Map" id="reportMap"></resultMap>
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 관리자 쿼리 시작 ]]]]]]]]]]]]]]]]]]]] -->
+	
+	<!-- 게시글 신고 내역 전체 조회 : jsonReportBoardList 호출 -->
+	<select id="reportBoardList" parameterType="java.util.Map" resultType="map">
+		SELECT r.report_no, c.board_no, c.board_title, r.report_sort, r.report_reason
+              ,r.report_date, b.member_name
+          FROM tb_report r, tb_community c, tb_member b
+         WHERE c.board_no is NOT NULL
+           AND r.report_sort is NOT NULL
+           AND r.report_reason is NOT NULL
+           AND r.board_no = c.board_no
+           AND c.member_no = b.member_no
+      ORDER BY report_no DESC
+	</select>
+	
+	<!-- 댓글 신고 내역 전체 조회 : jsonReportReplyList 호출 -->
+	<select id="reportReplyList" parameterType="java.util.Map" resultType="map">
+		SELECT r.report_no, y.reply_no, r.member_no2, r.report_date
+      		  ,y.reply_content, b.member_name
+  		  FROM tb_report r, tb_reply y, tb_member b
+ 		 WHERE y.reply_no is NOT NULL
+   		   AND y.reply_no = r.reply_no
+    	   AND y.member_no = b.member_no
+	  ORDER BY report_no DESC
+	</select>
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 관리자 쿼리 종료 ]]]]]]]]]]]]]]]]]]]] -->
+	
+	
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 회원 쿼리 시작 ]]]]]]]]]]]]]]]]]]]] -->
+
+	<!-- 게시글 신고 작성 -->
+	<insert id="reportBInsert" parameterType="map">
+		INSERT INTO tb_report
+	            (report_no, member_no, board_no, member_no2, report_sort, report_reason, report_date)
+	     VALUES (report_no_seq.nextval, #{member_no}, #{board_no}, #{member_no2}, #{report_sort}, #{report_reason}, sysdate)
+	</insert>
+	
+	<!-- 댓글 신고 작성 -->
+	<insert id="reportRInsert" parameterType="map">
+		INSERT INTO tb_report
+            	(report_no, member_no, board_no, reply_no, member_no2, report_date)
+     VALUES (report_no_seq.nextval, #{member_no}, #{board_no}, #{reply_no}, #{member_no2}, sysdate)
+		
+	</insert>
+	
+	<!-- [[[[[[[[[[[[[[[[[[[[ 회원 쿼리 종료 ]]]]]]]]]]]]]]]]]]]] -->
+	
+</mapper>

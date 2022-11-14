@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.reivewMapper">
+	<resultMap type="java.util.Map" id="reviewMap"></resultMap>
+
+	<!-- 리뷰 등록 -->
+	<insert id="insertReview"
+		parameterType="kh.sellermoon.member.vo.ReviewVO">
+		INSERT INTO TB_MDREVIEW(md_review_no, member_no, md_no
+		,md_review_content, md_review_written_date, md_review_like
+		, md_star,
+		best_review)
+		VALUES (MD_REVIEW_NO_SEQ.NEXTVAL, #{member_no},
+		#{md_no},
+		#{md_review_content}
+		, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 0, #{md_star},
+		'N')
+	</insert>
+
+	<!-- 리뷰 등록시 포인트 100원 지급 -->
+	<insert id="reviewPoint"
+		parameterType="kh.sellermoon.member.vo.PointVO">
+		INSERT INTO TB_POINT(point_no, point_date,
+		point_used_saved, member_no,
+		point_type)
+		VALUES (SEQ_TB_POINT_NO.NEXTVAL
+		,TO_CHAR(SYSDATE, 'YYYY-MM-DD HH:MM:SS'),100,#{member_no},3)
+	</insert>
+
+	<!-- 하나의 상품의 모든 리뷰 보기 -->
+	<select id="OneMdAllReview" parameterType="java.util.Map"
+		resultType="map">
+		SELECT rv.md_review_no, rv.member_no, rv.md_no,
+		rv.md_review_content
+		,rv.md_review_written_date, rv.md_review_like,
+		rv.md_star
+		, tm.member_name
+		FROM TB_MDREVIEW rv, TB_MEMBER tm
+		WHERE md_no
+		=#{md_no}
+		and rv.member_no = tm.member_no
+		ORDER BY md_review_no desc
+	</select>
+
+	<!-- 1명의 회원 모든 리뷰 보기 (마이페이지) -->
+	<select id="OneMemAllReview" parameterType="java.util.Map"
+		resultType="map">
+		SELECT rv.md_review_no, rv.member_no, rv.md_no,
+		rv.md_review_content
+		,rv.md_review_written_date, rv.md_review_like,
+		rv.md_star
+		,md.md_name
+		FROM TB_MDREVIEW rv, TB_MD md
+		WHERE member_no
+		=#{member_no}
+		and rv.md_no = md.md_no
+		ORDER BY rv.md_review_no desc
+	</select>
+
+	<!-- 리뷰 좋아요 -->
+	<update id="likeReview"
+		parameterType="kh.sellermoon.member.vo.ReviewVO">
+		UPDATE TB_MDREVIEW
+		SET md_review_like=md_review_like+1
+		WHERE md_review_no =
+		#{md_review_no}
+	</update>
+
+	<!-- 리뷰 수정 -->
+	<update id="updReview"
+		parameterType="kh.sellermoon.member.vo.ReviewVO">
+		UPDATE TB_MDREVIEW
+		SET md_review_content
+		=#{md_review_content}
+		WHERE
+		md_review_no = #{md_review_no}
+	</update>
+
+	<!-- 리뷰 수정 위한 select -->
+	<select id="updforReview"
+		resultType="kh.sellermoon.member.vo.ReviewVO">
+		SELECT *
+		FROM TB_MDREVIEW
+		WHERE md_review_no =
+		#{md_review_no}
+	</select>
+
+	<!-- 리뷰 삭제 -->
+	<delete id="delReview"
+		parameterType="kh.sellermoon.member.vo.ReviewVO">
+		DELETE FROM TB_MDREVIEW
+		WHERE md_review_no =
+		#{md_review_no}
+	</delete>
+
+	<!-- 리뷰 작성 전 구매한 제품인지 확인 리뷰는 주문하고 30일까지만 작성 가능-->
+	<select id="chkOrderR" parameterType="java.util.Map"
+		resultType="int">
+		SELECT count(*)
+		FROM(
+		SELECT tc.md_no, tmd.md_name
+		        ,tor.order_date
+		        ,tor.order_payment
+		        ,tm.member_no
+		 FROM tb_cart tc, tb_order tor, tb_md tmd, TB_MEMBER tm
+		WHERE tc.member_no = tor.member_no
+		  AND tmd.md_no = tc.md_no
+		  <![CDATA[AND TO_DATE(tor.order_date, 'YYYY/MM/DD HH24:MI:SS') <=
+		      TO_DATE(tor.order_date, 'YYYY/MM/DD HH24:MI:SS')+30]]>
+		  AND tm.member_no = tor.member_no
+		  AND tm.member_no = #{member_no}
+		  AND tmd.md_no = #{md_no}
+		  ORDER BY tor.order_date desc
+		)
+		<![CDATA[WHERE ROWNUM <= 1]]>
+	</select>
+
+	<!-- 관리자 리뷰 보기 -->
+	<select id="admReview" parameterType="java.util.Map" resultType="map">
+		SELECT rv.md_review_no, rv.member_no, tmd.md_no, rv.md_review_content
+		       ,rv.md_review_written_date, rv.md_review_like, rv.md_star
+		       , tm.member_name, tmd.md_name, rv.best_review
+		FROM TB_MDREVIEW rv INNER JOIN TB_MEMBER tm
+		  ON rv.member_no = tm.member_no
+		 INNER JOIN tb_md tmd ON rv.md_no = tmd.md_no
+		 <where>
+	  		<if test='md_no != null'>
+			 and tmd.md_no = #{md_no}
+	  		</if> 	  		 			  		
+		</where>	  			  		
+		ORDER BY md_review_no desc
+	</select>
+	
+	<!-- 관리자 베스트 리뷰 선정 -->
+	<update id="bestReview" parameterType="kh.sellermoon.member.vo.ReviewVO">
+		UPDATE TB_MDREVIEW 
+		SET best_review = 'Y'
+		WHERE md_review_no = #{md_review_no}
+		AND member_no = #{member_no}
+	</update>
+	
+	<!-- 베스트 리뷰 등록시 포인트 1000원 지급 -->
+	<insert id="bestPoint" parameterType="kh.sellermoon.member.vo.PointVO">
+		INSERT INTO TB_POINT(point_no, point_date
+			, point_used_saved, member_no, point_type)
+		VALUES (SEQ_TB_POINT_NO.NEXTVAL
+		,TO_CHAR(SYSDATE, 'YYYY-MM-DD HH:MM:SS'),1000,#{member_no},4)
+	</insert>
+	
+	<!-- 관리자 select box 위한 select문 -->
+	<select id="selectBox" parameterType="java.util.Map" resultType="map">
+		SELECT md_no, md_name 
+		FROM TB_MD
+		ORDER BY md_no
+	</select>
+
+</mapper>

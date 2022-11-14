@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.mybatis.mapper.pcartMapper">
+
+ 	<resultMap type="kh.sellermoon.member.vo.CartVO" id="cartMap">
+		<id property="cartNo" column="cart_no"/>
+		<result property="memberNo"     column="member_no"/>
+		<result property="mdNo"         column="md_no"/>
+		<result property="cartQuantity" column="cart_quantity"/>
+		<result property="orderType"    column="order_type"/>
+		<result property="orderYn"      column="cart_order_yn"/>
+		
+		<association property="mdVO" javaType="kh.sellermoon.member.vo.MdVO">
+	        <id property="mdNo" column="md_no"/>
+	        <result property="mdPrice" column="md_price"/>
+	        <result property="mdImageUrl" column="md_Image_Url"/>
+	        <result property="mdDiscount" column="md_Discount"/>
+	        <result property="mdDcPrice" column="dcprice"/>
+	        <result property="mdName" column="md_name"/>
+   		</association>
+	</resultMap>  
+
+	<select id="getAllPCartListVO" resultMap="cartMap" parameterType="java.util.Map">
+		SELECT  C.CART_NO, C.MEMBER_NO, C.CART_QUANTITY, C.ORDER_TYPE, 
+	            M.MD_NO, M.MD_IMAGE_URL, M.MD_DISCOUNT, M.MD_PRICE, M.MD_NAME,
+	            (MD_PRICE -  (MD_PRICE* MD_DISCOUNT * 0.01)) DCPRICE, CART_ORDER_YN
+		 FROM TB_CART C, TB_MD M
+		WHERE  C.MEMBER_NO = #{no}
+		  AND  C.CART_ORDER_YN = 'N'
+		  AND  C.MD_NO = M.MD_NO
+		<if test="orderType != null">
+		  AND  C.ORDER_TYPE = #{orderType}
+		</if>	
+	</select>
+	
+	<select id="existMdInCart" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT C.CART_QUANTITY CARTQUANTITY, C.CART_NO CARTNO
+		  FROM TB_CART  C, TB_MD M 
+		WHERE C.MD_NO = M.MD_NO 
+		  AND C.MEMBER_NO = #{memberNo}
+		  AND M.MD_NO = #{mdNo}  
+		  AND C.ORDER_TYPE = #{orderType}
+		  AND C.CART_ORDER_YN = 'N'
+	</select>
+	
+	<insert id="insertCart" parameterType="java.util.Map">
+		insert into tb_cart (cart_no,member_no,md_no,cart_quantity,order_type, cart_order_yn)
+		values (CART_SEQ.nextval , #{memberNo}, #{mdNo} ,#{cartQuantity}, #{orderType}, 'N')
+	</insert>
+	
+	<update id="updateCart" parameterType="java.util.Map">
+		update tb_cart 
+		   set cart_quantity = #{quantity}	
+		 where cart_no = #{cartNo}
+		   and member_no = #{memberNo}
+	</update>
+
+	<update id="deleteCart" parameterType="java.util.Map">
+		update tb_cart 
+		   set cart_order_yn = 'Y'	
+		 where cart_no = #{cartNo}
+		   and member_no = #{memberNo}
+	</update>
+
+	<select id="getOrderNumber" resultType="String">
+		SELECT * 
+		FROM (SELECT order_no 
+		      FROM tb_order 
+		      ORDER BY order_date DESC) 
+		<![CDATA[ WHERE ROWNUM <= 1 ]]> 
+	</select>
+
+	<insert id="insertSubs" parameterType="java.util.Map">
+		insert into tb_subs (sub_no, order_no, member_no, sub_start, sub_end, sub_period)
+		values (subs_seq.nextval , #{orderNo}, #{memberNo} ,#{startDate}, null, #{period})
+	</insert>
+	
+</mapper>
