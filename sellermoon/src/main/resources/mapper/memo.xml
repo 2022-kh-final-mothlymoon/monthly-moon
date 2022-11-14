@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.mybatis.mapper.memoMapper">
+	<resultMap type="java.util.Map" id="memoMap"></resultMap>
+	
+	<!-- 메세지 전체 조회 : jsonMemoList 호출 -->
+	<select id="memoList" parameterType="map" resultType="map">
+        SELECT msg_no, to_id, from_id, member_name, member_no
+              ,msg_content, msg_send_date
+              ,DECODE(read_yn, 'Y', '읽음', 'N', '읽지않음') AS read_yn
+          FROM tb_member NATURAL JOIN tb_msg
+      ORDER BY msg_no DESC
+	</select>
+	
+	<!-- 쪽지 작성하기 -->
+	<insert id="memoInsert" parameterType="map">
+		INSERT INTO tb_msg
+					(msg_no, member_no, from_id, to_id, msg_content, msg_send_date, read_yn)
+			 VALUES (msg_no_seq.nextval, #{member_no}, #{from_id}, #{to_id}
+			        ,#{msg_content}, to_char(sysdate, 'YYYY-MM-DD'), 'N')
+	</insert>
+	
+	<!-- 읽음 상태 업데이트 -->
+	<update id="memoUpdate" parameterType="map">
+		UPDATE tb_msg
+		   SET read_yn = 'Y'
+		 WHERE msg_no = #{msg_no}
+	</update>
+	
+	<!-- 받은/보낸 메세지 삭제 (한 건) -->
+	<delete id="memoDelete" parameterType="map">
+		DELETE FROM tb_msg
+		 WHERE msg_no = #{msg_no}
+	</delete>
+	
+	
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.adminMapper">
+	<resultMap type="java.util.Map" id="adminMap"></resultMap>
+	
+	<!-- 관리자 로그인 -->
+	<select id="Adminlogin" parameterType="map" resultType="kh.sellermoon.admin.vo.AdminVO">
+		SELECT admin_id, admin_name
+		FROM TB_ADMIN
+		WHERE admin_id =#{admin_id}
+		  AND admin_pw =#{admin_pw}
+	</select>
+	
+	<!-- 관리자 단에서 회원 정보 조회, 상세조회 -->
+	<select id="memberList" parameterType="java.util.Map" resultType="map">
+		SELECT DISTINCT tm.member_no, tm.member_name, tm.member_email
+		        , tm.member_phone, DECODE(tm.member_level,0,'초승달',1,'반달','보름달') member_level
+		        , tm.member_birth, tm.member_zipcode, tm.member_address, tm.member_address_detail
+		        , tm.member_code, tm.member_date, tm.member_method
+		        , CASE WHEN ts.sub_no IS NOT NULL THEN 'Y' ELSE 'N' END AS sub
+		FROM TB_MEMBER tm LEFT OUTER JOIN TB_SUBS ts
+		ON tm.member_no=ts.member_no
+		<where>
+	  		<if test='member_no != null'>
+			 	AND tm.member_no = #{member_no}
+	  		</if>
+	  		<if test='member_level != null'>
+			 	AND member_level = #{member_level}
+	  		</if>
+			<if test='gubun!=null and gubun.equals("member_no")'>
+				AND tm.member_no = #{keyword}
+			</if>	 	  		
+			<if test='gubun!=null and gubun.equals("member_email")'>
+				AND tm.member_email LIKE '%'||#{keyword}||'%'
+			</if>	  			  		
+		</where>
+  		ORDER BY tm.member_no asc
+	</select>
+	
+	<!-- 관리자 주문관리 리스트 보기-->
+	<select id="adminOrder" parameterType="java.util.Map" resultType="map">
+		SELECT DISTINCT tor.order_no, tm.member_no
+		       , tor.order_payment, tor.order_date
+		       , tm.member_name, tm.member_email
+		       , tm.member_zipcode, tm.member_address
+		       , tm.member_address_detail, tm.member_phone
+		       , tp.purchase_method
+		       , CASE WHEN ts.sub_no IS NOT NULL THEN 'Y' ELSE 'N' END AS sub
+		FROM tb_order tor INNER JOIN tb_member tm
+		ON tm.member_no = tor.member_no LEFT OUTER JOIN TB_SUBS ts
+		ON tm.member_no=ts.member_no LEFT OUTER JOIN TB_PURCHASE tp
+		ON tor.order_no=tp.order_no
+		<where>
+		  		<if test='order_no != null'>
+				 	AND tor.order_no = #{order_no}
+		  		</if>
+		</where>
+			ORDER BY tor.order_date desc
+	</select>
+	
+</mapper>

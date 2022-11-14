@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.mybatis.mapper.ProductMapper">
+
+	<resultMap type="kh.sellermoon.member.vo.MdVO" id="mdMap">
+		<id property="mdNo" column="MD_NO"/>
+		<result property="mdContent"        column="MD_CONTENT"/>
+		<result property="mdPrice"          column="MD_PRICE"/>
+		<result property="mdCategory"       column="MD_CATEGORY"/>
+		<result property="mdImage"          column="MD_IMAGE"/>
+		<result property="mdDetailImage"    column="MD_DETAIL_IMAGE"/>
+		<result property="mdDiscount"       column="MD_DISCOUNT"/>
+		<result property="mdCost"           column="MD_COST"/>
+		<result property="mdBrand"          column="MD_BRAND"/>
+		<result property="mdName"           column="MD_NAME"/>
+		<result property="mdImageUrl"       column="MD_IMAGE_URL"/>
+		<result property="mdDetailImageUrl" column="MD_DETAIL_IMAGE_URL"/>
+		<result property="stAmout"          column="ST_AMOUNT"/>
+	</resultMap> 
+
+	<select id="getAllProducts" resultMap="mdMap" parameterType="java.util.Map">
+		
+			SELECT * FROM TB_MD
+            WHERE 1 = 1
+			<if test="category != null">
+			<choose>
+				<when test="category == '기타'">
+                    AND MD_CATEGORY NOT IN ('생리대', '탐폰')
+				</when>
+				<otherwise> 
+					AND MD_CATEGORY = #{category}
+				</otherwise>
+			</choose>
+			</if>
+			
+			<choose>
+				<when test="sort == 'price'">
+					ORDER BY MD_PRICE
+				</when>
+				<otherwise> 
+					ORDER BY MD_NAME 
+				</otherwise>
+			</choose>
+		
+	</select>
+	
+	
+	<select id="getProductByNo" resultMap="mdMap">
+		SELECT * FROM TB_MD WHERE MD_NO = #{MDNO}
+	</select>
+	
+
+</mapper>

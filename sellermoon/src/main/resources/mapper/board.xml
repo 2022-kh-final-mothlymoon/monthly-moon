@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.mybatis.mapper.boardMapper">
+	<resultMap type="java.util.Map" id="boardMap"></resultMap>
+
+	<!-- [[[[[[[[[[[[[[[[[[[[[[ 공통 쿼리 시작 ]]]]]]]]]]]]]]]]]]]]]] -->
+
+	<!-- 커뮤니티 전체 글 조회 : jsonBoardList 호출 -->
+	<select id="boardList" parameterType="java.util.Map"
+		resultType="map">
+		SELECT board_no, board_category
+		,DECODE(board_blind, 'Y', '블라인드 처리된 게시글입니다.', board_title) AS board_title
+		,board_content, member_name, member_no, board_written_date, board_hit
+		,board_like, board_dislike, board_report_count, board_blind
+		FROM tb_community NATURAL JOIN tb_member
+		<where>
+			<!-- 상세보기 -->
+			<if test='board_no != null'>
+				AND board_no = #{board_no}
+			</if>
+			<!-- 카테고리 별로 보기 -->
+			<if test='board_no != null and board_category != null'>
+				AND board_category = #{board_category}
+			</if>
+		</where>
+		ORDER BY board_no DESC
+	</select>
+
+	<!-- 커뮤니티 상세 글 삭제 -->
+	<delete id="boardDelete" parameterType="map">
+		DELETE FROM tb_community
+		WHERE board_no = #{board_no}
+	</delete>
+
+	<!-- [[[[[[[[[[[[[[[[[[[[[[ 공통 쿼리 종료 ]]]]]]]]]]]]]]]]]]]]]] -->
+
+
+
+	<!-- [[[[[[[[[[[[[[[[[[[[[[ 관리자 쿼리 시작 ]]]]]]]]]]]]]]]]]]]]]] -->
+
+	<!-- 커뮤니티 상세 글 업데이트 : 블라인드 여부 설정 -->
+	<update id="boardAUpdate" parameterType="map">
+		UPDATE tb_community
+		SET board_blind = #{board_blind}
+		WHERE board_no = #{board_no}
+	</update>
+
+	<!-- [[[[[[[[[[[[[[[[[[[[[[ 관리자 쿼리 종료 ]]]]]]]]]]]]]]]]]]]]]] -->
+
+
+
+	<!-- [[[[[[[[[[[[[[[[[[[[[[ 회원 쿼리 시작 ]]]]]]]]]]]]]]]]]]]]]] -->
+
+	<!-- 커뮤니티 글 작성 -->
+	<insert id="boardMInsert" parameterType="map">
+		INSERT INTO tb_community
+		(board_no, member_no, board_title, board_content, board_written_date,
+		board_category, filename, fileurl)
+		VALUES (board_no_seq.NEXTVAL, #{member_no}, #{board_title},
+		#{board_content}, to_char(sysdate, 'YYYY-MM-DD'), #{board_category},
+		#{filename}, #{fileurl})
+	</insert>
+
+	<!-- 커뮤니티 글 수정 -->
+	<update id="boardMUpdate" parameterType="map">
+		UPDATE tb_community
+		SET board_category = #{board_category}
+		,board_title = #{board_title}
+		,board_content = #{board_content}
+		WHERE board_no = #{board_no}
+	</update>
+
+	<!-- 조회수 채번하기 -->
+	<update id="boardHit" parameterType="map">
+		UPDATE tb_community
+		SET board_hit = board_hit + 1
+		WHERE board_no = #{board_no}
+	</update>
+
+	<!-- 좋아요 버튼 눌렀을 떄 -->
+
+	<!-- 좋아요 버튼 취소했을 때 -->
+
+	<!-- 싫어요 버튼 눌렀을 때 -->
+
+	<!-- 싫어요 버튼 취소했을 때 = -->
+
+	<!-- [[[[[[[[[[[[[[[[[[[[[[ 회원 쿼리 종료 ]]]]]]]]]]]]]]]]]]]]]] -->
+
+	<select id="myBoard" parameterType="java.util.Map"
+		resultType="map">
+		SELECT board_no, board_category, board_title
+		,board_content, board_written_date, board_hit
+		,board_like, board_dislike, board_report_count, board_blind
+		FROM tb_community
+		WHERE member_no = #{member_no}
+		ORDER BY board_no DESC
+	</select>
+
+
+</mapper>

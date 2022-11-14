@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mybatis.mapper.myorderMapper">
+	<resultMap type="kh.sellermoon.member.vo.MyorderVO" id="myorderMap"></resultMap>
+	
+	<select id="myOrder" parameterType="map" resultType="java.util.Map">
+		SELECT ord.order_no, ord.order_date, car.order_type
+				, car.cart_quantity, md.md_name, md.md_brand, md.md_price
+       			, md.md_image_url, md.md_discount, del.delivery_status, del.delivery_fee
+       			, del.delivery_date, del.delivery_no, del.delivery_company
+		FROM 	tb_order ord, tb_delivery del, tb_cart car, tb_md md
+		WHERE 	ord.order_no  = del.order_no
+		AND 	ord.cart_no = car.cart_no
+		AND 	car.md_no = md.md_no
+		AND 	ord.member_no = #{member_no}
+		ORDER BY ord.order_no desc
+	</select>  
+	
+</mapper>	
