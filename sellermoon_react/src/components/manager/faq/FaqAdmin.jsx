@@ -21,7 +21,7 @@ import Footer from "../Common/Footer";
 
 const FaqAdmin = ({ isLogin, isAdmin, adminId }) => {
   let navigate = useNavigate();
-
+  let admin_id = sessionStorage.getItem("admin");
   const [faqList, setFaqList] = useState([]);
 
   const [tab, setTab] = useState(0); // 탭기능 0이면 0번째 내용 보이게, 1이면 1번째 내용 ...
@@ -65,7 +65,7 @@ const FaqAdmin = ({ isLogin, isAdmin, adminId }) => {
 
     let list = {
       // json 형태로 spring에 값을 넘김
-      admin_id: "002", /////////////////// 일단 상수로 넣음
+      admin_id: admin_id, /////////////////// 일단 상수로 넣음
       faq_title: e.target.faq_title.value,
       faq_content: e.target.faq_content.value,
       faq_category: category,

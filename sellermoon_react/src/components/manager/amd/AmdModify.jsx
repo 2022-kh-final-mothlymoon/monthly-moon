@@ -293,7 +293,7 @@ const AmdModify = ({ pictureUpload, isLogin, isAdmin, adminId }) => {
                 aria-label="Default select example"
               >
                 <option value={amdVO.STORE_NO} defaultValue>
-                  {"현재 거래체 번호 : " + amdVO.STORE_NO}
+                  {"현재 거래처 번호 : " + amdVO.STORE_NO}
                 </option>
                 {storeList.map((storeList) => (
                   <option value={storeList.STORE_NO}>
@@ -397,9 +397,7 @@ const AmdModify = ({ pictureUpload, isLogin, isAdmin, adminId }) => {
 
           <div style={{ textAlign: "center" }}>
             <Button
-              onClick={() => {
-                navigate("/admin/amd/modify/" + MD_NO);
-              }}
+              onClick={amdUpdate}
               variant="outline-secondary"
               id="btn_search"
               style={{ width: "100px" }}
