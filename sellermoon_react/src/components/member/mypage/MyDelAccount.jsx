@@ -84,7 +84,7 @@ const MyDelAccount = ({ no, isLogin, logout, myPoint, mySubs }) => {
                     <li>
                       보유 적립금&nbsp;
                       <strong style={{ color: "rgb(255, 72, 0)" }}>
-                        {myPoint.POINT_SUM.toLocaleString()} Point
+                        {myPoint.POINT_SUM} Point
                       </strong>
                     </li>
                     <li>정기구독 무료배송 서비스</li>
