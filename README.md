@@ -30,7 +30,8 @@
 
 <br>
 
-## 4️⃣
+## 4️⃣ ERD
+<img src="https://res.cloudinary.com/drxxdsv01/image/upload/v1668736636/ERD_bnmyid.jpg">
 
 <br>
 
