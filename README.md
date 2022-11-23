@@ -15,7 +15,9 @@
 - 프로젝트명 : **월간;문**
   - 달마다 돌아오는 월경(moon)
   - 구독의 주기마다 문 앞에 배송되는 특성(門)
-
+<br>
+<img src="https://res.cloudinary.com/dgtqsljjl/image/upload/v1669202638/localhost_3000__y6wffv.png">
+<br>
 <br>
 
 ## 2️⃣ 주제 선정 배경 및 의도
